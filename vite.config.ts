@@ -12,7 +12,8 @@ export default defineConfig(({ mode }) => {
       plugins: [react()],
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+        'import.meta.env.CAREERS_SCRIPT_URL': JSON.stringify(env.CAREERS_SCRIPT_URL ?? process.env.CAREERS_SCRIPT_URL)
       },
       resolve: {
         alias: {

@@ -2,8 +2,43 @@
 import React, { useState } from 'react';
 import { Icons } from '../constants';
 
+const GOOGLE_SCRIPT_URL = import.meta.env.CAREERS_SCRIPT_URL ?? '';
+
 const Careers = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    city: '',
+    state: '',
+    phone: '',
+    vehicleType: 'Sedan / SUV',
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (!GOOGLE_SCRIPT_URL) {
+      setError('Form submission is not configured. Please contact the administrator.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(formData),
+      });
+      setSubmitted(true);
+    } catch (err) {
+      setError('Something went wrong. Please try again or contact us directly.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="py-24">
@@ -64,37 +99,42 @@ const Careers = () => {
               <>
                 <h2 className="text-2xl font-bold text-navy mb-2">Apply to Drive</h2>
                 <p className="text-slate-500 mb-8 text-sm">Start your professional driver application. No fees are required to apply.</p>
-                <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}>
+                <form className="space-y-6" onSubmit={handleSubmit}>
+                  {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                      {error}
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Full Name</label>
-                      <input type="text" className="w-full border-b py-2 focus:border-navy outline-none transition-colors bg-transparent text-slate-900" placeholder="John Doe" required />
+                      <input type="text" value={formData.fullName} onChange={(e) => setFormData((p) => ({ ...p, fullName: e.target.value }))} className="w-full border-b py-2 focus:border-navy outline-none transition-colors bg-transparent text-slate-900" placeholder="John Doe" required />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Email Address</label>
-                      <input type="email" className="w-full border-b py-2 focus:border-navy outline-none transition-colors bg-transparent text-slate-900" placeholder="john@example.com" required />
+                      <input type="email" value={formData.email} onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))} className="w-full border-b py-2 focus:border-navy outline-none transition-colors bg-transparent text-slate-900" placeholder="john@example.com" required />
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-2">City</label>
-                      <input type="text" className="w-full border-b py-2 focus:border-navy outline-none transition-colors bg-transparent text-slate-900" placeholder="Chicago" required />
+                      <input type="text" value={formData.city} onChange={(e) => setFormData((p) => ({ ...p, city: e.target.value }))} className="w-full border-b py-2 focus:border-navy outline-none transition-colors bg-transparent text-slate-900" placeholder="Chicago" required />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-2">State</label>
-                      <input type="text" className="w-full border-b py-2 focus:border-navy outline-none transition-colors bg-transparent text-slate-900" placeholder="IL" required />
+                      <input type="text" value={formData.state} onChange={(e) => setFormData((p) => ({ ...p, state: e.target.value }))} className="w-full border-b py-2 focus:border-navy outline-none transition-colors bg-transparent text-slate-900" placeholder="IL" required />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Phone Number</label>
-                      <input type="tel" className="w-full border-b py-2 focus:border-navy outline-none transition-colors bg-transparent text-slate-900" placeholder="(555) 000-0000" required />
+                      <input type="tel" value={formData.phone} onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))} className="w-full border-b py-2 focus:border-navy outline-none transition-colors bg-transparent text-slate-900" placeholder="(555) 000-0000" required />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Vehicle Type</label>
-                      <select className="w-full border-b py-2 focus:border-navy outline-none bg-transparent text-slate-900">
+                      <select value={formData.vehicleType} onChange={(e) => setFormData((p) => ({ ...p, vehicleType: e.target.value }))} className="w-full border-b py-2 focus:border-navy outline-none bg-transparent text-slate-900">
                         <option className="text-slate-900">Sedan / SUV</option>
                         <option className="text-slate-900">Sprinter / Cargo Van</option>
                         <option className="text-slate-900">Box Truck</option>
@@ -106,8 +146,8 @@ const Careers = () => {
                     <p className="text-xs text-slate-400 mb-6">
                       By clicking "Submit Application", you acknowledge that Sentinel Logistics Group will contact you regarding potential contracting opportunities. Background checks are only initiated after a conditional contract offer.
                     </p>
-                    <button type="submit" className="w-full bg-navy text-white py-4 rounded-xl font-bold hover:bg-charcoal shadow-lg shadow-navy/20 transition-all">
-                      Submit Application
+                    <button type="submit" disabled={loading} className="w-full bg-navy text-white py-4 rounded-xl font-bold hover:bg-charcoal shadow-lg shadow-navy/20 transition-all disabled:opacity-70 disabled:cursor-not-allowed">
+                      {loading ? 'Submitting...' : 'Submit Application'}
                     </button>
                   </div>
                 </form>

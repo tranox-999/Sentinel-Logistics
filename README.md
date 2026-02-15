@@ -33,12 +33,14 @@ Professional high-value and sensitive delivery logistics provider specializing i
    npm install
    ```
 
-2. **Configure API key**  
-   Create `.env.local` in the project root and add your Gemini API key:
+2. **Configure environment**  
+   Copy `.env.example` to `.env.local` and set:
    ```
    GEMINI_API_KEY=your_api_key_here
+   CAREERS_SCRIPT_URL=https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec
    ```
-   Get a key at [Google AI Studio](https://aistudio.google.com/apikey).
+   - Get a Gemini key at [Google AI Studio](https://aistudio.google.com/apikey).
+   - Careers form: add `CAREERS_SCRIPT_URL` (Google Apps Script web app URL). For Netlify, set it as an env variable in Site settings.
 
 3. **Start dev server**
    ```bash
