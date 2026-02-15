@@ -1,0 +1,9 @@
+
+{
+  "name": "Sentinel Logistics Group",
+  "description": "Professional high-value and sensitive delivery logistics provider specializing in medical and special-needs equipment.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera"
+  ]
+}
